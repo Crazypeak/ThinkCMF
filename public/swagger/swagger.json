@@ -1,0 +1,38 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "This is my website cool API",
+        "description": "Api description...",
+        "termsOfService": "",
+        "version": "1.0.0"
+    },
+    "host": "127.0.0.1",
+    "basePath": "/api",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "paths": {},
+    "definitions": {
+        "goodsCart": {
+            "properties": {
+                "id": {
+                    "description": "\u5546\u54c1id",
+                    "type": "integer",
+                    "default": "10"
+                },
+                "number": {
+                    "description": "\u5546\u54c1\u6570\u91cf",
+                    "type": "integer",
+                    "default": "10"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "User",
+            "description": "\u7528\u6237\u63a5\u53e3"
+        }
+    ]
+}
