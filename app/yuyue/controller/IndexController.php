@@ -28,14 +28,20 @@ class IndexController extends AdminBaseController{
 
         switch ($model) {
             case 'goods':
-                $text_all     = ['name', 'batch_code', 'bar_code', 'product_code'];
-                $select_all   = ['depot_id', 'class_id'];
+                $text_all     = ['name', 'product_code'];
+                $select_all   = ['category_id'];
+                $time_status  = false;
+                $depot_status = true;
+                break;
+            case 'deposit':
+                $text_all     = ['name', 'code'];
+                $select_all   = [];
                 $time_status  = false;
                 $depot_status = true;
                 break;
             case 'order':
                 $text_all     = ['order_code'];
-                $select_all   = ['status', 'ck_status', 'depot_id'];
+                $select_all   = ['status', 'ck_status'];
                 $time_status  = true;
                 $depot_status = true;
                 break;
@@ -65,9 +71,9 @@ class IndexController extends AdminBaseController{
 //    }
 
 //    //商品分类+选择
-//    if (isset($get['class_id']) && isset($select_all['class_id'])) {
-//        $where['class_id'] = ['IN', Commodity::getClassID($get['class_id'])];
-//        unset($get['class_id']);
+//    if (isset($get['category_id']) && isset($select_all['category_id'])) {
+//        $where['category_id'] = ['IN', Commodity::getCategoryID($get['category_id'])];
+//        unset($get['category_id']);
 //    }
 
         //模糊搜索与一般选择

@@ -20,6 +20,18 @@ class LogModel extends Model
         return Db::name('log')->where($where)->order(['create_time' => 'ASC'])->page(intval($page), 20)->select();
     }
 
+    /**
+     * post_content 自动转化
+     * @param $value
+     * @return string
+     */
+    public static function getPostContentAttr($data)
+    {
+        if(isset($data['content'])){
+            return cmf_replace_content_file_url(htmlspecialchars_decode($data['content']));
+        }else return '';
+    }
+
 //    public static function getLogOne($id)
 //    {
 ////        $where = ['record_id' => $record_id,'record_table'=>$record_table];
@@ -38,7 +50,7 @@ class LogModel extends Model
     public static function addLog($type = 0, $record_id = 0, $remark = '',$nickname = '')
     {
         return true;
-//        $record_text = ['user', 'auth_rule', 'goods', 'goods_class', 'api'];
+//        $record_text = ['user', 'auth_rule', 'goods', 'goods_category', 'api'];
 //
 //        $data['create_time']  = time();
 //        $data['record_table'] = $record_text[$type];

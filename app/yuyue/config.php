@@ -6,5 +6,6 @@
  * Time: 17:23
  */
 return [
-  'PRODUCT_CODE_KEY' => 'P'
+    'PRODUCT_CODE_KEY' => 'P',
+    'DEPOSIT_CODE_KEY' => 'D',
 ];

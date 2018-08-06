@@ -15,7 +15,7 @@ class GoodsValidate extends Validate
     protected $rule = [
         'name'             => ['require',],
         'pid'              => ['require', 'number'],
-        'class_id'         => ['require', 'number'],
+        'category_id'         => ['require', 'number'],
         'bar_code'         => ['require', 'alphaNum'],
         'product_code'     => ['require', 'alphaNum'],
 //        'min_price'        => ['require', 'float'],
@@ -37,8 +37,8 @@ class GoodsValidate extends Validate
         'name.require'             => '名称不能为空',
         'pid.require'              => '上级分类错误',
         'pid.number'               => '上级分类错误',
-        'class_id.require'         => '分类错误',
-        'class_id.number'          => '分类错误',
+        'category_id.require'         => '分类错误',
+        'category_id.number'          => '分类错误',
         'bar_code.require'         => '条形码错误',
         'bar_code.alphaNum'        => '条形码错误',
         'product_code.require'     => '平台货号错误',
@@ -56,7 +56,7 @@ class GoodsValidate extends Validate
         'stock.require'            => '库存错误',
         'stock.float'              => '库存错误',
         'status.require'           => '状态错误',
-        'status.float'             => '状态错误',
+        'status.number'             => '状态错误',
         'img_url.require'          => '请上传封面图片',
         'spec.require'             => '规格不能为空',
 //        'unit.require'             => '单位不能为空',
@@ -68,10 +68,10 @@ class GoodsValidate extends Validate
     ];
 
     protected $scene = [
-        'goods_class' => ['name'],
+        'goods_category' => ['name','status'],
         'goods_save'  => [
             'name',
-            'class_id',
+            'category_id',
             'selling_price',
             'market_price',
             'supply_price',

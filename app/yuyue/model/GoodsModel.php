@@ -38,7 +38,7 @@ class GoodsModel extends LogModel
      */
     public static function getGoodsOne($where = [], $field = true)
     {
-        return Db::table('commodity_view')->where($where)->field($field)->find();
+        return Db::name('goods')->where($where)->field($field)->find();
     }
 
     /**
@@ -48,6 +48,8 @@ class GoodsModel extends LogModel
      */
     public static function getGoodsList($where = [])
     {
+        $where = ['status' => ['NEQ', '99']];
+
         return Db::name('goods')
             ->where($where)
             ->order(['create_time' => 'DESC',])
@@ -67,8 +69,8 @@ class GoodsModel extends LogModel
 //            if ($result)
 //                return '该条形码已存在于其它商品';
 
-            $row['name']     = trim($data['name']);             //名称
-            $row['class_id'] = $data['class_id'];               //分类id
+            $row['name']        = trim($data['name']);             //名称
+            $row['category_id'] = $data['category_id'];               //分类id
 //            $row['bar_code']         = trim($data['bar_code']);         //条码
             $row['product_code']  = $data['product_code'];           //货号
             $row['selling_price'] = trim($data['selling_price']);    //售卖价格
@@ -85,7 +87,10 @@ class GoodsModel extends LogModel
 //            $row['brokerage_type']   = $data['brokerage_type'];         //反现种类
 //            $row['brokerage_number'] = $data['brokerage_number'];       //反现佣金
 
-            $row['create_time'] = date('Y-m-d H:i:s');
+            $row['remark']  = $data['remark'];      //简介
+            $row['content'] = self::getPostContentAttr($data);     //详情
+
+            $row['create_time'] = time();
 
             $id = Db::name('goods')->insertGetId($row);
 
@@ -105,27 +110,35 @@ class GoodsModel extends LogModel
     {
         $validate = Loader::validate('Goods', 'validate', false, 'yuyue');
         if ($validate->scene('goods_save')->check($data)) {
-            $result = Db::table('commodity_view')->where(['id' => ['NEQ', $data['id']], 'bar_code' => $data['bar_code']])->find();
-            if ($result)
-                return '该条形码已存在于其它商品';
+//            $result = Db::name('goods')->where(['bar_code' => $data['bar_code']])->find();
+//            if ($result)
+//                return '该条形码已存在于其它商品';
 
-            $row['name']             = $data['name'];
-            $row['class_id']         = $data['class_id'];
-            $row['bar_code']         = trim($data['bar_code']);
-            $row['supply_price']     = 0;
-            $row['selling_price']    = 0;
-            $row['stock_alert']      = trim($data['stock_alert']);
-            $row['img_url']          = $data['img_url'];
-            $row['model']            = $data['model'];
-            $row['unit']             = $data['unit'];
-            $row['currency']         = '';
-            $row['brokerage_type']   = $data['brokerage_type'];
-            $row['brokerage_number'] = $data['brokerage_number'];
+            $row['name']        = trim($data['name']);             //名称
+            $row['category_id'] = $data['category_id'];               //分类id
+//            $row['bar_code']         = trim($data['bar_code']);         //条码
+//            $row['product_code']  = $data['product_code'];           //货号
+            $row['selling_price'] = trim($data['selling_price']);    //售卖价格
+            $row['market_price']  = trim($data['market_price']);     //市场价格
+            $row['supply_price']  = trim($data['supply_price']);     //成本价格
+            $row['stock']         = trim($data['stock']);            //库存
+//            $row['stock_alert']      = trim($data['stock_alert']);      //库存警告
 
-            $result = Db::name('commodity')->where(['id' => $data['id']])->update($row);
+            $row['status']  = $data['status'];                  //状态
+            $row['img_url'] = $data['img_url'];                 //封面
+//            $row['model']            = $data['model'];                  //规格
+//            $row['unit']             = $data['unit'];                   //单位
+//            $row['currency']         = '';                              //币种
+//            $row['brokerage_type']   = $data['brokerage_type'];         //反现种类
+//            $row['brokerage_number'] = $data['brokerage_number'];       //反现佣金
+
+            $row['remark']  = $data['remark'];      //简介
+            $row['content'] = self::getPostContentAttr($data);     //详情
+
+            $result = Db::name('goods')->where(['id' => $data['id']])->update($row);
 
             //记录操作日志
-            $result && Log::addLog(2, $data['id'], '编辑商品信息');
+            $result && LogModel::addLog(2, $data['id'], '编辑商品信息');
 
             return '';
         } else return $validate->getError();
@@ -135,16 +148,17 @@ class GoodsModel extends LogModel
      * 商品删除
      * 限制只能删除待审核商品
      * @param int $id
+     * @param int $status
      */
-    public static function delGoods($id = 0)
+    public static function delGoods($id = 0, $status = 0)
     {
-        $where = ['id' => $id, 'status' => 10];
+        $where = ['id' => $id, 'status' => $status];
 
-        $goods  = Commodity::getGoodsOne($where);
-        $result = Commodity::changeGoods([$id], 99, $goods['status']);
+        $goods  = self::getGoodsOne($where);
+        $result = self::changeGoods([$id], 99, $goods['status']);
 
         //记录操作日志
-        $result && Log::addLog(2, $id, '删除商品');
+        $result && LogModel::addLog(2, $id, '删除商品');
 
         return $result;
     }
@@ -158,13 +172,13 @@ class GoodsModel extends LogModel
     public static function changeGoods($ids = [], $status = 10, $old_status = 10)
     {
         $ids    = is_array($ids) ? $ids : [$ids];
-        $result = Db::name('commodity')->where(['id' => ['IN', $ids], 'status' => $old_status])->update(['status' => $status]);
+        $result = Db::name('goods')->where(['id' => ['IN', $ids], 'status' => $old_status])->update(['status' => $status]);
 
         //记录操作日志
-        $status_text = [0 => '待审核', 1 => '上架', 10 => '下架', 99 => '软删除'];
+        $status_text = [0 => '下架', 1 => '上架', 99 => '软删除'];
         if ($result)
             foreach ($ids as $id) {
-                Log::addLog(2, $id, $status_text[$old_status] . '商品');
+                LogModel::addLog(2, $id, $status_text[$old_status] . '商品');
             }
 
         return $result;
@@ -177,38 +191,38 @@ class GoodsModel extends LogModel
      * @return false|\PDOStatement|string|\think\Collection
      * ----------------------------
      */
-    public static function getClassList($where = [])
+    public static function getCategoryList($where = [])
     {
-        return Db::name('goods_class')->where($where)->select();
+        return Db::name('goods_category')->where($where)->column('*', 'id');
     }
 
-    public static function getClassOne($id = 0)
+    public static function getCategoryOne($id = 0)
     {
-        return Db::name('goods_class')->where(['id' => $id])->find();
+        return Db::name('goods_category')->where(['id' => $id])->find();
     }
 
-    public static function saveClass($data)
+    public static function saveCategory($data)
     {
         $validate = Loader::validate('Goods', 'validate', false, 'yuyue');
-        if ($validate->scene('goods_class')->check($data)) {
+        if ($validate->scene('goods_category')->check($data)) {
             $data['name']   = trim($data['name']);
             $data['remark'] = trim($data['remark']);
 //            $row['pid']  = $data['pid'];
 //
             if (isset($data['id']) && is_numeric($data['id'])) {
-                Db::name('goods_class')->where(['id' => $data['id']])->update($data);
+                Db::name('goods_category')->where(['id' => $data['id']])->update($data);
                 LogModel::addLog(3, $data['id'], '编辑商品分类');
             } else {
                 $data['create_time'] = time();
 
-                $id = Db::name('goods_class')->insertGetId($data);
+                $id = Db::name('goods_category')->insertGetId($data);
                 LogModel::addLog(3, $id, '新增商品分类');
             }
 //
 //            //层次，结构概念方便搜索用
-//            $parent = self::getClassOne($data['pid']);
+//            $parent = self::getCategoryOne($data['pid']);
 //            $layer  = ($parent ? $parent['layer'] : '') . $id . ',';
-//            Db::name('goods_class')->where(['id' => $id])->update(['layer' => $layer]);
+//            Db::name('goods_category')->where(['id' => $id])->update(['layer' => $layer]);
 
             return '';
         } else return $validate->getError();
@@ -219,17 +233,17 @@ class GoodsModel extends LogModel
      * 循环删除当前分类下级分类，并循环到删除再下级
      * @param $id
      */
-    public static function delClass($id = 0)
+    public static function delCategory($id = 0)
     {
-//        $result = Db::name('goods_class')->where(['pid' => $id])->find();
+//        $result = Db::name('goods_category')->where(['pid' => $id])->find();
 //        if ($result)
 //            return '商品分类存在子级分类';
 
-        $result = Db::name('goods')->where(['class_id' => $id])->find();
+        $result = Db::name('goods')->where(['category_id' => $id])->find();
         if ($result)
             return '商品分类存在商品';
 
-        Db::name('goods_class')->where(['id' => $id])->delete();
+        Db::name('goods_category')->where(['id' => $id])->delete();
         LogModel::addLog(3, $id, '删除商品分类');
 
         return '';
