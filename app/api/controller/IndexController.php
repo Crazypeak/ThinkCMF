@@ -15,17 +15,17 @@ use think\Url;
 class IndexController extends Controller
 {
 
-    protected function success($msg, $code = 1, $data = '',$url=null)
+    public function success($msg = '', $code = 1, $data = '',$url=null,array $header=[])
     {
-        $this->result($msg,$code,$data,$url);
+        $this->resultAjax($msg,$code,$data,$url);
     }
 
-    protected function error($msg, $code = 0, $data = '',$url=null)
+    public function error($msg = '', $code = 0, $data = '',$url=null,array $header=[])
     {
-        $this->result($msg,$code,$data,$url);
+        $this->resultAjax($msg,$code,$data,$url);
     }
 
-    protected function result($msg, $code = 0, $data = '',$url=null){
+    protected function resultAjax($msg, $code = 0, $data = '',$url=null){
         if ('' !== $url && !strpos($url, '://') && 0 !== strpos($url, '/')) {
             $url = Url::build($url);
         }
@@ -52,6 +52,8 @@ class IndexController extends Controller
      *     schemes={"http","https"},
      *     host="127.0.0.1",
      *     basePath="/api",
+     *     consumes={"multipart/form-data"},
+     *     produces={"application/json"},
      *     @SWG\Info(
      *         version="1.0.0",
      *         title="This is my website cool API",

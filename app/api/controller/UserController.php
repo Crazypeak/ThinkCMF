@@ -23,7 +23,7 @@ class UserController extends IndexController
      *   operationId="captcha",
      *   @SWG\Response(
      *     response=200,
-     *     description="返回图片信息",
+     *     description="直接返回图片",
      *   ),
      * )
      */
@@ -35,29 +35,30 @@ class UserController extends IndexController
     /**
      * @SWG\Post(path="/User/doLogin",
      *   tags={"User"},
-     *   summary="提交订单",
+     *   summary="登录提交接口",
      *   operationId="doLogin",
      *   @SWG\Parameter(
-     *     name="body",
-     *     in="body",
-     *     description="captcha:验证码，username:电话，password:密码,",
-     *     @SWG\Schema(
-     *      @SWG\Property(
-     *          property="captcha",
-     *          type="string",
-     *          description="验证码"
-     *      ),
-     *      @SWG\Property(
-     *          property="username",
-     *          type="integer",
-     *          description="电话"
-     *      ),
-     *      @SWG\Property(
-     *          property="password",
-     *          type="string",
-     *          description="密码"
-     *      ),
-     *     ),
+     *     description="用户名称",
+     *     in="formData",
+     *     name="username",
+     *     required=true,
+     *     type="string",
+     *     default="admin",
+     *   ),
+     *   @SWG\Parameter(
+     *     description="用户密码",
+     *     in="formData",
+     *     name="password",
+     *     required=true,
+     *     type="string",
+     *     default="qweqwe",
+     *   ),
+     *   @SWG\Parameter(
+     *     description="验证码",
+     *     in="formData",
+     *     name="captcha",
+     *     required=true,
+     *     type="string",
      *   ),
      *   @SWG\Response(
      *     response=200,

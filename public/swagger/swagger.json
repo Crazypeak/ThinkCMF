@@ -12,40 +12,62 @@
         "http",
         "https"
     ],
+    "consumes": [
+        "multipart/form-data"
+    ],
+    "produces": [
+        "application/json"
+    ],
     "paths": {
+        "/User/captcha": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "\u9a8c\u8bc1\u7801\u83b7\u53d6",
+                "operationId": "captcha",
+                "responses": {
+                    "200": {
+                        "description": "\u76f4\u63a5\u8fd4\u56de\u56fe\u7247"
+                    }
+                }
+            }
+        },
         "/User/doLogin": {
             "post": {
                 "tags": [
                     "User"
                 ],
-                "summary": "\u63d0\u4ea4\u8ba2\u5355",
+                "summary": "\u767b\u5f55\u63d0\u4ea4\u63a5\u53e3",
                 "operationId": "doLogin",
                 "parameters": [
                     {
-                        "name": "body",
-                        "in": "body",
-                        "description": "captcha:\u9a8c\u8bc1\u7801\uff0cusername:\u7535\u8bdd\uff0cpassword:\u5bc6\u7801,",
-                        "schema": {
-                            "properties": {
-                                "captcha": {
-                                    "description": "\u9a8c\u8bc1\u7801",
-                                    "type": "string"
-                                },
-                                "username": {
-                                    "description": "\u7535\u8bdd",
-                                    "type": "integer"
-                                },
-                                "password": {
-                                    "description": "\u5bc6\u7801",
-                                    "type": "string"
-                                }
-                            }
-                        }
+                        "name": "username",
+                        "in": "formData",
+                        "description": "\u7528\u6237\u540d\u79f0",
+                        "required": true,
+                        "type": "string",
+                        "default": "admin"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "\u7528\u6237\u5bc6\u7801",
+                        "required": true,
+                        "type": "string",
+                        "default": "qweqwe"
+                    },
+                    {
+                        "name": "captcha",
+                        "in": "formData",
+                        "description": "\u9a8c\u8bc1\u7801",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "\u64cd\u4f5c\u6210\u529f"
+                        "description": "\u767b\u5f55\u6210\u529f"
                     }
                 }
             }
