@@ -21,7 +21,7 @@ class CaptchaController
      * @param Request $request
      * @return \think\Response
      */
-    public function index(Request $request)
+    public static function index(Request $request)
     {
         $config = [
             // 验证码字体大小(px)

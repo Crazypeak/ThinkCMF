@@ -10,13 +10,26 @@ namespace app\api\controller;
 
 use think\Controller;
 use think\Response;
-use Swagger;
+use think\Url;
 
 class IndexController extends Controller
 {
 
-    protected function foot($data, $code = 1, $msg = '成功',$url=null)
+    protected function success($msg, $code = 1, $data = '',$url=null)
     {
+        $this->result($msg,$code,$data,$url);
+    }
+
+    protected function error($msg, $code = 0, $data = '',$url=null)
+    {
+        $this->result($msg,$code,$data,$url);
+    }
+
+    protected function result($msg, $code = 0, $data = '',$url=null){
+        if ('' !== $url && !strpos($url, '://') && 0 !== strpos($url, '/')) {
+            $url = Url::build($url);
+        }
+
         $result = [
             'code' => $code,
             'msg'  => $msg,
@@ -68,7 +81,7 @@ class IndexController extends Controller
      */
     public function index()
     {
-        $path = __DIR__ . '/../../'; //你想要哪个文件夹下面的注释生成对应的API文档
+        $path = __DIR__ . '/../'; //你想要哪个文件夹下面的注释生成对应的API文档
         $swagger = \Swagger\scan($path);
         // header('Content-Type: application/json');
         // echo $swagger;
